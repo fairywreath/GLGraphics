@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include "Shader.h"
+
 
 /* glfw callbacks */
 void frameResizeCallback(GLFWwindow* window, int width, int height)
@@ -23,64 +25,7 @@ void processInput(GLFWwindow* window)
 int success;
 char infoLog[512];
 
-/* shader compilation */
 GLuint shaderProgram;
-
-void compileShaders() {
-	GLuint vs;
-	GLuint fs;
-
-	const char* vertexShaderSource = "#version 460 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"}\0";
-
-	vs = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs, 1, &vertexShaderSource, NULL);
-	glCompileShader(vs);
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vs, 512, NULL, infoLog);
-		std::cout << "ERROR: Vertex Shader Compilation Failed\n" << infoLog << "\n";
-	}
-
-
-	const char* fragmentShaderSource = "#version 460 core\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor = vec4(0.7f, 0.7f, 0.1f, 1.0f);\n"
-		"}\n";
-
-	fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fs);
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fs, 512, NULL, infoLog);
-		std::cout << "ERROR: Fragment Shader Compilation Failed\n" << infoLog << "\n";
-	}
-
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vs);
-	glAttachShader(shaderProgram, fs);
-	glLinkProgram(shaderProgram);
-
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR: Shader Program Linking Failed\n" << infoLog << "\n";
-	}
-
-	glUseProgram(shaderProgram);
-	glDeleteShader(vs);
-	glDeleteShader(fs);
-}
-
 
 /* simple triangle */
 GLuint triangleVBO;
@@ -139,9 +84,8 @@ void setupRectangle() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectangleIndices), rectangleIndices, GL_STATIC_DRAW);
 	/* NOTE: a VAO can only be binded with 1 index buffering or EBO */
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// NOTE: VBO binded to VAO here
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// NOTE: VBO binded to VAO here, hence can safely unbind vbo
 	glEnableVertexAttribArray(0);
-
 
 	// unbind, except for EBO
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -192,7 +136,9 @@ int main()
 	glfwSetFramebufferSizeCallback(window, frameResizeCallback);
 
 
-	compileShaders();
+	Shader simpleShader("src/shaders/simple_vs.glsl", "src/shaders/simple_fs.glsl");
+	shaderProgram = simpleShader.getID();
+
 	setupTriangle();
 	setupRectangle();
 
