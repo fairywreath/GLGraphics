@@ -3,10 +3,17 @@
 
 #include <iostream>
 
-// adjust viewport when window is changed
 void frameResizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
 }
 
 int main()
@@ -18,7 +25,7 @@ int main()
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);	
 
-	GLFWwindow* window = glfwCreateWindow(1280, 720, "Fairy Wreath", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(1280, 720, "Simple Window", nullptr, nullptr);
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create window" << std::endl;
@@ -30,7 +37,7 @@ int main()
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		std::cout << "Failed to initialize glad" << std::endl;
+		std::cout << "Failed to initialize glad.\n";
 		return -1;
 	}
 
@@ -39,6 +46,11 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
+		processInput(window);
+
+		glClearColor(1, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
+
 		glfwSwapBuffers(window);		// swap color buffer for rendering to output screen, double buffer 
 		glfwPollEvents();
 	}
