@@ -5,6 +5,10 @@
 
 #include "ShaderProgram.h"
 #include "Texture.h"
+#include "scene/SceneNode.h"
+
+#include "content/SimpleTriangle.h"
+#include "content/TexturedRectangle.h"
 
 
 /* glfw callbacks */
@@ -20,148 +24,6 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 	}
 }
-
-
-/* error checking and logging */
-int success;
-char infoLog[512];
-
-ShaderProgram simpleShader;
-
-/* simple triangle */
-GLuint triangleVBO;
-GLuint triangleVAO;
-
-float triangleVertices[] = {
-	-0.5f , -0.5f, 0.0f,
-	0.5f , -0.5f, 0.0f,
-	0.0f , 0.5f, 0.0f
-};
-
-float triangleTexCoords[] = {
-	0.0f, 0.0f,  // lower-left corner  
-	1.0f, 0.0f,  // lower-right corner
-	0.5f, 1.0f   // top-center corner
-};
-
-void setupTriangle() {
-	glGenVertexArrays(1, &triangleVAO);
-	glBindVertexArray(triangleVAO);
-
-	glGenBuffers(1, &triangleVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// unbind
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-
-/* rectangle using indexed drawing */
-GLuint rectangleVBO;
-GLuint rectangleEBO;
-GLuint rectangleVAO;
-
-float rectangleVertices[] = {
-	 0.5f,  0.5f, 0.0f,  // top right
-	 0.5f, -0.5f, 0.0f,  // bottom right
-	-0.5f, -0.5f, 0.0f,  // bottom left
-	-0.5f,  0.5f, 0.0f   // top left 
-};
-
-unsigned int rectangleIndices[] = {
-	0, 1, 3,	// first triangle: top right, top left, bottom right
-	1, 2, 3		// second triangle: bottom right, bottom left, top left
-};
-
-void setupRectangle() {
-	glGenVertexArrays(1, &rectangleVAO);
-	glBindVertexArray(rectangleVAO);
-
-	glGenBuffers(1, &rectangleVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, rectangleVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &rectangleEBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rectangleEBO);	// NOTE: EBO is binded to the VAO here
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectangleIndices), rectangleIndices, GL_STATIC_DRAW);
-	/* NOTE: a VAO can only be binded with 1 index buffering or EBO */
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// NOTE: VBO binded to VAO here, hence can safely unbind vbo
-	glEnableVertexAttribArray(0);
-
-	// unbind, except for EBO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-/* textured rectangle */
-float texturedRectangleVertices[] = {
-	// positions          // colors           // texture coords
-	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-};
-
-GLuint texturedRectangleVAO;
-GLuint texturedRectangleVBO;
-GLuint texturedRectangleEBO;
-Texture woodTexture;
-
-void setupTexturedRectangle()
-{
-	glGenVertexArrays(1, &texturedRectangleVAO);
-	glGenBuffers(1, &texturedRectangleVBO);
-	glGenBuffers(1, &texturedRectangleEBO);
-
-	glBindVertexArray(texturedRectangleVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, texturedRectangleVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(texturedRectangleVertices), texturedRectangleVertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texturedRectangleEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectangleIndices), rectangleIndices, GL_STATIC_DRAW);
-
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// texture coord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-	
-	// unbind, except for EBO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	woodTexture.load("resources/textures/wood_rect_texture.jpg");
-}
-
-
-void render() {
-	glClearColor(0.f, 0.f, 0.f, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	simpleShader.use();
-
-	//glBindVertexArray(triangleVAO);
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
-
-	//glBindVertexArray(rectangleVAO);
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-	glBindTexture(GL_TEXTURE_2D, woodTexture.getID());
-	glBindVertexArray(texturedRectangleVAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
-
 
 int main()
 {
@@ -191,19 +53,27 @@ int main()
 	glViewport(0, 0, 1280, 720);	// lower left corner, 1280 x  720
 	glfwSetFramebufferSizeCallback(window, frameResizeCallback);
 
-
+	ShaderProgram simpleShader;
 	simpleShader.load("shaders/simple_vs.glsl", "shaders/simple_fs.glsl");
-	//shaderProgram = simpleShader.getID();
 
-	setupTriangle();
-	setupRectangle();
-	setupTexturedRectangle();
+	SceneNode sceneGraph;
+
+	auto simpleTriangle = std::make_unique<SimpleTriangle>();
+	simpleTriangle->init();
+	//sceneGraph.attachChild(std::move(simpleTriangle));
+
+	auto texturedRectangle = std::make_unique<TexturedRectangle>();
+	texturedRectangle->init();
+	sceneGraph.attachChild(std::move(texturedRectangle));
+
 
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
 		
-		render();
+		//render();
+		simpleShader.use();
+		sceneGraph.draw();
 
 		glfwSwapBuffers(window);		// swap color buffer for rendering to output screen, double buffer 
 		glfwPollEvents();
