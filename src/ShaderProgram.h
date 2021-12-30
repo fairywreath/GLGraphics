@@ -1,16 +1,20 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef SHADERPROGRAM_H
+#define SHADERPROGRAM_H
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <string>
 
-class Shader
+class ShaderProgram
 {
 public:
-	Shader(const char* vsPath, const char* fsPath);
-	
+	ShaderProgram();
+	ShaderProgram(const char* vsPath, const char* fsPath);
+	virtual ~ShaderProgram();
+
+	bool load(const char* vsPath, const char* fsPath);
+
 	void use() const;
 	GLuint getID() const;
 

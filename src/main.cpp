@@ -3,7 +3,8 @@
 
 #include <iostream>
 
-#include "Shader.h"
+#include "ShaderProgram.h"
+#include "Texture.h"
 
 
 /* glfw callbacks */
@@ -25,16 +26,22 @@ void processInput(GLFWwindow* window)
 int success;
 char infoLog[512];
 
-GLuint shaderProgram;
+ShaderProgram simpleShader;
 
 /* simple triangle */
 GLuint triangleVBO;
 GLuint triangleVAO;
 
 float triangleVertices[] = {
-	0.5f , 0.5f, 0.0f,
-	0.0f , 0.5f, 0.0f,
-	0.5f , 0.0f, 0.0f
+	-0.5f , -0.5f, 0.0f,
+	0.5f , -0.5f, 0.0f,
+	0.0f , 0.5f, 0.0f
+};
+
+float triangleTexCoords[] = {
+	0.0f, 0.0f,  // lower-left corner  
+	1.0f, 0.0f,  // lower-right corner
+	0.5f, 1.0f   // top-center corner
 };
 
 void setupTriangle() {
@@ -92,17 +99,66 @@ void setupRectangle() {
 	glBindVertexArray(0);
 }
 
+/* textured rectangle */
+float texturedRectangleVertices[] = {
+	// positions          // colors           // texture coords
+	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+};
+
+GLuint texturedRectangleVAO;
+GLuint texturedRectangleVBO;
+GLuint texturedRectangleEBO;
+Texture woodTexture;
+
+void setupTexturedRectangle()
+{
+	glGenVertexArrays(1, &texturedRectangleVAO);
+	glGenBuffers(1, &texturedRectangleVBO);
+	glGenBuffers(1, &texturedRectangleEBO);
+
+	glBindVertexArray(texturedRectangleVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, texturedRectangleVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(texturedRectangleVertices), texturedRectangleVertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texturedRectangleEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectangleIndices), rectangleIndices, GL_STATIC_DRAW);
+
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	// color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	// texture coord attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	
+	// unbind, except for EBO
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	woodTexture.load("resources/textures/wood_rect_texture.jpg");
+}
+
 
 void render() {
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(shaderProgram);
+	simpleShader.use();
 
 	//glBindVertexArray(triangleVAO);
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	glBindVertexArray(rectangleVAO);
+	//glBindVertexArray(rectangleVAO);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	glBindTexture(GL_TEXTURE_2D, woodTexture.getID());
+	glBindVertexArray(texturedRectangleVAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -136,11 +192,12 @@ int main()
 	glfwSetFramebufferSizeCallback(window, frameResizeCallback);
 
 
-	Shader simpleShader("src/shaders/simple_vs.glsl", "src/shaders/simple_fs.glsl");
-	shaderProgram = simpleShader.getID();
+	simpleShader.load("shaders/simple_vs.glsl", "shaders/simple_fs.glsl");
+	//shaderProgram = simpleShader.getID();
 
 	setupTriangle();
 	setupRectangle();
+	setupTexturedRectangle();
 
 	while (!glfwWindowShouldClose(window))
 	{
