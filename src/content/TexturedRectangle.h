@@ -12,6 +12,7 @@ public:
 	TexturedRectangle();
 
 	void init() override;
+	void setShaderProgram(GLuint program);
 
 private:
 	void drawCurrent() override;
@@ -21,6 +22,10 @@ private:
 	GLuint VBO;
 	GLuint EBO;
 	Texture texture;
+
+	Texture texture2;
+
+	GLuint shaderProgram;
 };
 
 #endif

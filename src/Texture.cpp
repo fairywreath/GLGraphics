@@ -21,6 +21,10 @@ GLuint Texture::getID() const
 bool Texture::load(const std::string& path)
 {
 	int width, height, nrChannels;
+
+	// opengl expects 0.0 to be bottom y, but images have 0.0 at the top 
+	stbi_set_flip_vertically_on_load(true);
+	
 	unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 	if (data == nullptr)
 	{

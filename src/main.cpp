@@ -63,6 +63,7 @@ int main()
 	//sceneGraph.attachChild(std::move(simpleTriangle));
 
 	auto texturedRectangle = std::make_unique<TexturedRectangle>();
+	texturedRectangle->setShaderProgram(simpleShader.getID());
 	texturedRectangle->init();
 	sceneGraph.attachChild(std::move(texturedRectangle));
 

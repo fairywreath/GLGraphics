@@ -4,7 +4,8 @@
 TexturedRectangle::TexturedRectangle() :
 	VAO(0),
 	VBO(0),
-	EBO(0)
+	EBO(0),
+	shaderProgram(0)
 {
 }
 
@@ -50,8 +51,16 @@ void TexturedRectangle::init()
 	glBindVertexArray(0);
 
 	texture.load("resources/textures/wood_rect_texture.jpg");
-	//texture.load("resources/textures/wood_texture.jpg");
+	texture2.load("resources/textures/some_night_elf2.jpg");
 
+	glUseProgram(shaderProgram);
+	glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0);	// set texture1 as GL_TEXTURE0
+	glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 1);	// set texture1 as GL_TEXTURE1
+}
+
+void TexturedRectangle::setShaderProgram(GLuint program)
+{
+	shaderProgram = program;
 }
 
 void TexturedRectangle::drawCurrent()
@@ -61,7 +70,15 @@ void TexturedRectangle::drawCurrent()
 
 	
 	// right now shader is used outside
+
+	//glBindTexture(GL_TEXTURE_2D, texture.getID());
+
+	// use 2 textures
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture.getID());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texture2.getID());
+
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
