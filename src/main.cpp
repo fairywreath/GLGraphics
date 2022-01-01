@@ -6,9 +6,11 @@
 #include "ShaderProgram.h"
 #include "Texture.h"
 #include "scene/SceneNode.h"
+#include "core/Window.h"
 
 #include "content/SimpleTriangle.h"
 #include "content/TexturedRectangle.h"
+#include "content/RotatingCube.h"
 
 
 /* glfw callbacks */
@@ -29,29 +31,17 @@ int main()
 {
 	glfwInit();
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);	
-
-	GLFWwindow* window = glfwCreateWindow(1280, 720, "Simple Window", nullptr, nullptr);
-	if (window == nullptr)
-	{
-		std::cout << "Failed to create window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-
-	glfwMakeContextCurrent(window);		// state machine, set current context window
-
+	Window window(1600, 900, "Simple Window");
+	window.init();
+	
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize glad.\n";
 		return -1;
 	}
 
-	glViewport(0, 0, 1280, 720);	// lower left corner, 1280 x  720
-	glfwSetFramebufferSizeCallback(window, frameResizeCallback);
+	glViewport(0, 0, window.getWidth(), window.getHeight());	
+	glfwSetFramebufferSizeCallback(window.getWindowHandle(), frameResizeCallback); 
 
 	ShaderProgram simpleShader;
 	simpleShader.load("shaders/simple_vs.glsl", "shaders/simple_fs.glsl");
@@ -65,19 +55,23 @@ int main()
 	auto texturedRectangle = std::make_unique<TexturedRectangle>();
 	texturedRectangle->setShaderProgram(simpleShader.getID());
 	texturedRectangle->init();
-	sceneGraph.attachChild(std::move(texturedRectangle));
+	//sceneGraph.attachChild(std::move(texturedRectangle));
+
+	auto rotatingCube = std::make_unique<RotatingCube>();
+	rotatingCube->init();
+	sceneGraph.attachChild(std::move(rotatingCube));
 
 
-	while (!glfwWindowShouldClose(window))
+	while (!window.shouldClose())
 	{
-		processInput(window);
+		processInput(window.getWindowHandle());
 		
 		//render();
-		simpleShader.use();
+		//simpleShader.use();
 		sceneGraph.draw();
+		sceneGraph.update((float)glfwGetTime());
 
-		glfwSwapBuffers(window);		// swap color buffer for rendering to output screen, double buffer 
-		glfwPollEvents();
+		window.nextFrame();
 	}
 
 	glfwTerminate();
