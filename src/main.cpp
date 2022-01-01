@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include "ShaderProgram.h"
-#include "Texture.h"
+#include "Shading/ShaderProgram.h"
+#include "Shading/Texture.h"
 #include "scene/SceneNode.h"
 #include "core/Window.h"
 
@@ -48,31 +48,44 @@ int main()
 
 	SceneNode sceneGraph;
 
-	auto simpleTriangle = std::make_unique<SimpleTriangle>();
-	simpleTriangle->init();
+	//auto simpleTriangle = std::make_unique<SimpleTriangle>();
+	//simpleTriangle->init();
 	//sceneGraph.attachChild(std::move(simpleTriangle));
 
-	auto texturedRectangle = std::make_unique<TexturedRectangle>();
-	texturedRectangle->setShaderProgram(simpleShader.getID());
-	texturedRectangle->init();
+	//auto texturedRectangle = std::make_unique<TexturedRectangle>();
+	//texturedRectangle->setShaderProgram(simpleShader.getID());
+	//texturedRectangle->init();
 	//sceneGraph.attachChild(std::move(texturedRectangle));
 
 	auto rotatingCube = std::make_unique<RotatingCube>();
 	rotatingCube->init();
+	
+	auto rotatingCube2 = std::make_unique<RotatingCube>();
+	rotatingCube2->init();
+	rotatingCube2->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
+	rotatingCube2->setScale(glm::vec3(0.25f, 0.25f, 0.25f));
+
+	rotatingCube->attachChild(std::move(rotatingCube2));
 	sceneGraph.attachChild(std::move(rotatingCube));
+
 
 
 	while (!window.shouldClose())
 	{
+		glClearColor(0.f, 0.f, 0.f, 1.f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		processInput(window.getWindowHandle());
 		
-		//render();
 		//simpleShader.use();
+
 		sceneGraph.draw();
 		sceneGraph.update((float)glfwGetTime());
 
 		window.nextFrame();
 	}
+
+	window.destroy();
 
 	glfwTerminate();
 

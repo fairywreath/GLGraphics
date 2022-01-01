@@ -3,6 +3,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <iostream>
+
+RotatingCube::~RotatingCube()
+{
+    //std::cout << "rot cube node destroyed\n";
+}
+
 void RotatingCube::init()
 {
     float vertices[] = {
@@ -78,6 +85,7 @@ void RotatingCube::init()
     shader.setInt("texture2", 1);
 
     model = glm::mat4(1.0f);
+    currentAngle = 0.f;
 }
 
 void RotatingCube::setShaderProgram(GLuint program)
@@ -86,9 +94,6 @@ void RotatingCube::setShaderProgram(GLuint program)
 
 void RotatingCube::drawCurrent()
 {
-    glClearColor(0.f, 0.f, 0.f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1.getID());
     glActiveTexture(GL_TEXTURE1);
@@ -102,6 +107,8 @@ void RotatingCube::drawCurrent()
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     projection = glm::perspective(glm::radians(45.0f), (float)1600 / (float)900, 0.1f, 100.0f);
 
+    model = getGlobalTransform();
+
     shader.setMat4("model", model);
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
@@ -112,6 +119,10 @@ void RotatingCube::drawCurrent()
 
 void RotatingCube::updateCurrent(float dt)
 {
-    model = glm::mat4(1.0f);
-    model = glm::rotate(model, dt * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    //setScale(glm::vec3(0.3f, 0.3f, 0.3f));
+
+    currentAngle = dt;
+    setRotationQuaternion(glm::angleAxis(currentAngle, 
+        glm::normalize(glm::vec3(0.5f, 1.0f, 0.3f))));
+
 }

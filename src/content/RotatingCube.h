@@ -5,13 +5,15 @@
 #include <glm/glm.hpp>
 
 #include "../scene/SceneNode.h"
-#include "../Texture.h"
-#include "../ShaderProgram.h"
+#include "../Shading/Texture.h"
+#include "../Shading/ShaderProgram.h"
 
 
 class RotatingCube : public SceneNode
 {
 public:
+	~RotatingCube() override;
+
 	void init() override;
 	void setShaderProgram(GLuint program);
 
@@ -29,6 +31,8 @@ private:
 	Texture texture2;
 
 	glm::mat4 model;
+
+	float currentAngle;
 };
 
 

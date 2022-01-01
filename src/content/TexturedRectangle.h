@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 
 #include "../scene/SceneNode.h"
-#include "../Texture.h"
+#include "../shading/Texture.h"
 
 class TexturedRectangle : public SceneNode
 {

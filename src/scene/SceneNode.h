@@ -4,7 +4,11 @@
 #include <vector>
 #include <memory>
 
-class SceneNode
+#include <glm/glm.hpp>
+
+#include "Transformable.h"
+
+class SceneNode : public Transformable
 {
 public:
 	using NodePtr = std::unique_ptr<SceneNode>;
@@ -23,7 +27,13 @@ public:
 	NodePtr detachChild(const SceneNode& child);
 
 	SceneNode* getParent() const;
+	SceneNode* getRoot();
 
+	const glm::mat4& getGlobalTransform();
+	void forceComputeTransform();
+
+	void decomposeGlobalMatrix(glm::vec3& position, glm::quat& rotation, glm::vec3& scale);
+	glm::vec3 getAbsolutePosition();
 
 private:	
 	virtual void drawCurrent();
@@ -31,6 +41,13 @@ private:
 
 	void drawChildren();
 	void updateChildren(float dt);
+
+	void setParentGlobalTransform(const glm::mat4 transform);
+
+protected:
+	glm::mat4 mGlobalTransform;
+	glm::mat4 mParentGlobalTransform;
+	bool mGlobalTransformDirty;
 
 private:
 	std::vector<NodePtr> mChildren;
