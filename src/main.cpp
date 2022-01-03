@@ -3,10 +3,12 @@
 
 #include <iostream>
 
-#include "Shading/ShaderProgram.h"
-#include "Shading/Texture.h"
+#include "shading/ShaderProgram.h"
+#include "shading/Texture.h"
 #include "scene/SceneNode.h"
+#include "scene/Camera.h"
 #include "core/Window.h"
+#include "core/CameraController.h"
 
 #include "content/SimpleTriangle.h"
 #include "content/TexturedRectangle.h"
@@ -18,6 +20,14 @@ void frameResizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 }
+
+FlyCameraController* flyCCp;
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	flyCCp->onCursorPos(xpos, ypos);
+}
+
 
 void processInput(GLFWwindow* window)
 {
@@ -65,22 +75,44 @@ int main()
 	rotatingCube2->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
 	rotatingCube2->setScale(glm::vec3(0.25f, 0.25f, 0.25f));
 
-	rotatingCube->attachChild(std::move(rotatingCube2));
+	RotatingCube* rc = rotatingCube.get();
+	//rotatingCube->attachChild(std::move(rotatingCube2));
 	sceneGraph.attachChild(std::move(rotatingCube));
 
+	
+	float currentFrame;
+	float deltaTime = 0.f;
+	float lastFrame = 0.f;
 
+	FlyCamera flyCam((float)1600/(float)900);
+	FlyCameraController camCtrl(&window, &flyCam);
+
+	flyCCp = &camCtrl;
+	//glfwSetCursorPosCallback(window.getWindowHandle(), mouse_callback);
+
+
+	window.setCursorMode(GLFW_CURSOR_DISABLED);
 
 	while (!window.shouldClose())
 	{
+		currentFrame = (float)glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		processInput(window.getWindowHandle());
+
+		camCtrl.update(deltaTime);
+		flyCam.update(deltaTime);
+
+		rc->getShaderProgram().setMat4("view", flyCam.getViewMatrix());
+		rc->getShaderProgram().setMat4("projection", flyCam.getProjectionMatrix());
+
+		//simpleShader.use();
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		processInput(window.getWindowHandle());
-		
-		//simpleShader.use();
-
 		sceneGraph.draw();
-		sceneGraph.update((float)glfwGetTime());
+		sceneGraph.update(deltaTime);
 
 		window.nextFrame();
 	}

@@ -92,6 +92,11 @@ void RotatingCube::setShaderProgram(GLuint program)
 {
 }
 
+const ShaderProgram& RotatingCube::getShaderProgram()
+{
+    return shader;
+}
+
 void RotatingCube::drawCurrent()
 {
     glActiveTexture(GL_TEXTURE0);
@@ -110,8 +115,8 @@ void RotatingCube::drawCurrent()
     model = getGlobalTransform();
 
     shader.setMat4("model", model);
-    shader.setMat4("view", view);
-    shader.setMat4("projection", projection);
+    //shader.setMat4("view", view);
+    //shader.setMat4("projection", projection);
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -121,7 +126,7 @@ void RotatingCube::updateCurrent(float dt)
 {
     //setScale(glm::vec3(0.3f, 0.3f, 0.3f));
 
-    currentAngle = dt;
+    currentAngle += dt;
     setRotationQuaternion(glm::angleAxis(currentAngle, 
         glm::normalize(glm::vec3(0.5f, 1.0f, 0.3f))));
 

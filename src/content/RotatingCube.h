@@ -17,6 +17,8 @@ public:
 	void init() override;
 	void setShaderProgram(GLuint program);
 
+	const ShaderProgram& getShaderProgram();
+
 private:
 	void drawCurrent() override;
 	void updateCurrent(float dt) override;
