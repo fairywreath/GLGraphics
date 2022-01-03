@@ -38,6 +38,7 @@ bool Window::init()
     glfwSetMouseButtonCallback(mWindow, onMouseButtonCallback);
     glfwSetKeyCallback(mWindow, onKeyCallback);
     glfwSetFramebufferSizeCallback(mWindow, onResizeCallback);
+    glfwSetScrollCallback(mWindow, onScrollCallback);
 
     setContextCurrent();
     return true;
@@ -164,6 +165,14 @@ void Window::onResize(int width, int height)
     }
 }
 
+void Window::onScroll(double xoffset, double yoffset)
+{
+    for (auto observer : mObservers)
+    {
+        observer->onScroll(xoffset, yoffset);
+    }
+}
+
 
 void Window::onCursorPosCallback(GLFWwindow* window, double x, double y)
 {
@@ -183,4 +192,9 @@ void Window::onKeyCallback(GLFWwindow* window, int key, int scancode, int action
 void Window::onResizeCallback(GLFWwindow* window, int width, int height)
 {
     static_cast<Window*>(glfwGetWindowUserPointer(window))->onResize(width, height);
+}
+
+void Window::onScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    static_cast<Window*>(glfwGetWindowUserPointer(window))->onScroll(xoffset, yoffset);
 }

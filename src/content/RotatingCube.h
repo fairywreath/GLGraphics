@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "../scene/SceneNode.h"
+#include "../scene/Camera.h"
 #include "../Shading/Texture.h"
 #include "../Shading/ShaderProgram.h"
 
@@ -19,11 +20,14 @@ public:
 
 	const ShaderProgram& getShaderProgram();
 
+	void setCamera(CameraBase* cam);
+
 private:
 	void drawCurrent() override;
 	void updateCurrent(float dt) override;
 
 private:
+	CameraBase* camera = nullptr;
 	ShaderProgram shader;
 	
 	GLuint VAO;

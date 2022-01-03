@@ -97,6 +97,11 @@ const ShaderProgram& RotatingCube::getShaderProgram()
     return shader;
 }
 
+void RotatingCube::setCamera(CameraBase* cam)
+{
+    camera = cam;
+}
+
 void RotatingCube::drawCurrent()
 {
     glActiveTexture(GL_TEXTURE0);
@@ -115,6 +120,11 @@ void RotatingCube::drawCurrent()
     model = getGlobalTransform();
 
     shader.setMat4("model", model);
+    if (camera != nullptr) 
+    {
+        shader.setMat4("view", camera->getViewMatrix());
+        shader.setMat4("projection", camera->getProjectionMatrix());
+    }
     //shader.setMat4("view", view);
     //shader.setMat4("projection", projection);
 

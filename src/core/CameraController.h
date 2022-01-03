@@ -15,6 +15,7 @@ public:
 	void onMouseButton(int key, int action, int mods) override;
 	void onKey(int key, int scancode, int action, int mods) override;
 	void onResize(int width, int height) override;
+	void onScroll(double xoffset, double yoffset) override;
 
 	void setCameraSpeed(float speed);
 

@@ -57,35 +57,27 @@ int main()
 	simpleShader.load("shaders/simple_vs.glsl", "shaders/simple_fs.glsl");
 
 	SceneNode sceneGraph;
-
-	//auto simpleTriangle = std::make_unique<SimpleTriangle>();
-	//simpleTriangle->init();
-	//sceneGraph.attachChild(std::move(simpleTriangle));
-
-	//auto texturedRectangle = std::make_unique<TexturedRectangle>();
-	//texturedRectangle->setShaderProgram(simpleShader.getID());
-	//texturedRectangle->init();
-	//sceneGraph.attachChild(std::move(texturedRectangle));
+	FlyCamera flyCam((float)1600 / (float)900);
+	FlyCameraController camCtrl(&window, &flyCam);
 
 	auto rotatingCube = std::make_unique<RotatingCube>();
 	rotatingCube->init();
+	rotatingCube->setCamera(&flyCam);
 	
 	auto rotatingCube2 = std::make_unique<RotatingCube>();
 	rotatingCube2->init();
+	rotatingCube2->setCamera(&flyCam);
 	rotatingCube2->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
 	rotatingCube2->setScale(glm::vec3(0.25f, 0.25f, 0.25f));
 
 	RotatingCube* rc = rotatingCube.get();
-	//rotatingCube->attachChild(std::move(rotatingCube2));
+	rotatingCube->attachChild(std::move(rotatingCube2));
 	sceneGraph.attachChild(std::move(rotatingCube));
 
 	
 	float currentFrame;
 	float deltaTime = 0.f;
 	float lastFrame = 0.f;
-
-	FlyCamera flyCam((float)1600/(float)900);
-	FlyCameraController camCtrl(&window, &flyCam);
 
 	flyCCp = &camCtrl;
 	//glfwSetCursorPosCallback(window.getWindowHandle(), mouse_callback);
@@ -99,17 +91,12 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		processInput(window.getWindowHandle());
-
-		camCtrl.update(deltaTime);
-		flyCam.update(deltaTime);
-
-		rc->getShaderProgram().setMat4("view", flyCam.getViewMatrix());
-		rc->getShaderProgram().setMat4("projection", flyCam.getProjectionMatrix());
-
-		//simpleShader.use();
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		processInput(window.getWindowHandle());
+		camCtrl.update(deltaTime);
+		flyCam.update(deltaTime);
 
 		sceneGraph.draw();
 		sceneGraph.update(deltaTime);

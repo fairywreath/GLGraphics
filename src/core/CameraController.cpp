@@ -8,9 +8,9 @@ FlyCameraController::FlyCameraController(Window* window, FlyCamera* camera) :
 	mLastX(0.f),
 	mLastY(0.f),
 	mCameraSpeed(0),
-	mBaseCameraSpeed(5.5f),
+	mBaseCameraSpeed(2.5f),
 	mFirstMouse(true),
-	mSensitivity(0.03f),
+	mSensitivity(0.01f),
 	mRollSensitivity(0.01f)
 {
 	if (window == nullptr || camera == nullptr) {
@@ -139,6 +139,11 @@ void FlyCameraController::onKey(int key, int scancode, int action, int mods)
 
 void FlyCameraController::onResize(int width, int height)
 {
+}
+
+void FlyCameraController::onScroll(double xoffset, double yoffset)
+{
+	mCamera->zoom((float)-yoffset/2.0f);
 }
 
 void FlyCameraController::setCameraSpeed(float speed)
