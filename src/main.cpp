@@ -60,6 +60,12 @@ int main()
 	FlyCamera flyCam((float)1600 / (float)900);
 	FlyCameraController camCtrl(&window, &flyCam);
 
+	ShaderProgram shader;
+	shader.load("shaders/transform_vs.glsl", "shaders/simple_fs.glsl");
+	shader.use();
+	shader.setInt("texture1", 0);
+	shader.setInt("texture2", 1);
+	
 	auto rotatingCube = std::make_unique<RotatingCube>();
 	rotatingCube->init();
 	rotatingCube->setCamera(&flyCam);
@@ -70,11 +76,13 @@ int main()
 	rotatingCube2->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
 	rotatingCube2->setScale(glm::vec3(0.25f, 0.25f, 0.25f));
 
-	RotatingCube* rc = rotatingCube.get();
+	rotatingCube->setShaderProgram(&shader);
+	rotatingCube2->setShaderProgram(&shader);
+
+
 	rotatingCube->attachChild(std::move(rotatingCube2));
 	sceneGraph.attachChild(std::move(rotatingCube));
 
-	
 	float currentFrame;
 	float deltaTime = 0.f;
 	float lastFrame = 0.f;
@@ -98,8 +106,13 @@ int main()
 		camCtrl.update(deltaTime);
 		flyCam.update(deltaTime);
 
+
+		shader.setMat4("view", flyCam.getViewMatrix());
+		shader.setMat4("projection", flyCam.getProjectionMatrix());
+
 		sceneGraph.draw();
 		sceneGraph.update(deltaTime);
+
 
 		window.nextFrame();
 	}

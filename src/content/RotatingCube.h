@@ -16,9 +16,9 @@ public:
 	~RotatingCube() override;
 
 	void init() override;
-	void setShaderProgram(GLuint program);
+	void setShaderProgram(ShaderProgram* sdr);
 
-	const ShaderProgram& getShaderProgram();
+	ShaderProgram* getShaderProgram() const;
 
 	void setCamera(CameraBase* cam);
 
@@ -28,7 +28,7 @@ private:
 
 private:
 	CameraBase* camera = nullptr;
-	ShaderProgram shader;
+	ShaderProgram* shader;
 	
 	GLuint VAO;
 	GLuint VBO;

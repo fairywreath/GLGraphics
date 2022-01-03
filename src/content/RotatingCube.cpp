@@ -79,20 +79,21 @@ void RotatingCube::init()
     texture1.load("resources/textures/wood_rect_texture.jpg");
     texture2.load("resources/textures/some_night_elf2.jpg");
 
-    shader.load("shaders/transform_vs.glsl", "shaders/simple_fs.glsl");
-    shader.use();
-    shader.setInt("texture1", 0);
-    shader.setInt("texture2", 1);
+    //shader.load("shaders/transform_vs.glsl", "shaders/simple_fs.glsl");
+    //shader.use();
+    //shader.setInt("texture1", 0);
+    //shader.setInt("texture2", 1);
 
     model = glm::mat4(1.0f);
     currentAngle = 0.f;
 }
 
-void RotatingCube::setShaderProgram(GLuint program)
+void RotatingCube::setShaderProgram(ShaderProgram* sdr)
 {
+    shader = sdr;
 }
 
-const ShaderProgram& RotatingCube::getShaderProgram()
+ShaderProgram* RotatingCube::getShaderProgram() const
 {
     return shader;
 }
@@ -109,22 +110,27 @@ void RotatingCube::drawCurrent()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2.getID());
 
-    shader.use();
+   
 
     // create transformations
-    glm::mat4 view = glm::mat4(1.0f);
+   /* glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    projection = glm::perspective(glm::radians(45.0f), (float)1600 / (float)900, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), (float)1600 / (float)900, 0.1f, 100.0f);*/
 
     model = getGlobalTransform();
 
-    shader.setMat4("model", model);
-    if (camera != nullptr) 
+    if (shader != nullptr)
     {
-        shader.setMat4("view", camera->getViewMatrix());
-        shader.setMat4("projection", camera->getProjectionMatrix());
+        shader->use();
+        shader->setMat4("model", model);
     }
+   
+    //if (camera != nullptr) 
+    //{
+    //    shader.setMat4("view", camera->getViewMatrix());
+    //    shader.setMat4("projection", camera->getProjectionMatrix());
+    //}
     //shader.setMat4("view", view);
     //shader.setMat4("projection", projection);
 
