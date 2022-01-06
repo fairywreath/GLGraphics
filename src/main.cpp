@@ -13,19 +13,13 @@
 #include "content/SimpleTriangle.h"
 #include "content/TexturedRectangle.h"
 #include "content/RotatingCube.h"
+#include "content/LightingScene.h"
 
 
 /* glfw callbacks */
 void frameResizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-}
-
-FlyCameraController* flyCCp;
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-	flyCCp->onCursorPos(xpos, ypos);
 }
 
 
@@ -53,46 +47,22 @@ int main()
 	glViewport(0, 0, window.getWidth(), window.getHeight());	
 	glfwSetFramebufferSizeCallback(window.getWindowHandle(), frameResizeCallback); 
 
-	ShaderProgram simpleShader;
-	simpleShader.load("shaders/simple_vs.glsl", "shaders/simple_fs.glsl");
-
 	SceneNode sceneGraph;
 	FlyCamera flyCam((float)1600 / (float)900);
 	FlyCameraController camCtrl(&window, &flyCam);
 
-	ShaderProgram shader;
-	shader.load("shaders/transform_vs.glsl", "shaders/simple_fs.glsl");
-	shader.use();
-	shader.setInt("texture1", 0);
-	shader.setInt("texture2", 1);
-	
-	auto rotatingCube = std::make_unique<RotatingCube>();
-	rotatingCube->init();
-	rotatingCube->setCamera(&flyCam);
-	
-	auto rotatingCube2 = std::make_unique<RotatingCube>();
-	rotatingCube2->init();
-	rotatingCube2->setCamera(&flyCam);
-	rotatingCube2->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
-	rotatingCube2->setScale(glm::vec3(0.25f, 0.25f, 0.25f));
-
-	rotatingCube->setShaderProgram(&shader);
-	rotatingCube2->setShaderProgram(&shader);
-
-
-	rotatingCube->attachChild(std::move(rotatingCube2));
-	sceneGraph.attachChild(std::move(rotatingCube));
+	auto lightingScene = std::make_unique<LightingScene>();
+	lightingScene->init();
+	lightingScene->setCamera(&flyCam);
+	sceneGraph.attachChild(std::move(lightingScene));
 
 	float currentFrame;
 	float deltaTime = 0.f;
 	float lastFrame = 0.f;
 
-	flyCCp = &camCtrl;
-	//glfwSetCursorPosCallback(window.getWindowHandle(), mouse_callback);
-
-
 	window.setCursorMode(GLFW_CURSOR_DISABLED);
 
+	glEnable(GL_DEPTH_TEST);
 	while (!window.shouldClose())
 	{
 		currentFrame = (float)glfwGetTime();
@@ -107,12 +77,8 @@ int main()
 		flyCam.update(deltaTime);
 
 
-		shader.setMat4("view", flyCam.getViewMatrix());
-		shader.setMat4("projection", flyCam.getProjectionMatrix());
-
 		sceneGraph.draw();
 		sceneGraph.update(deltaTime);
-
 
 		window.nextFrame();
 	}

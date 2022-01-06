@@ -8,9 +8,9 @@ FlyCameraController::FlyCameraController(Window* window, FlyCamera* camera) :
 	mLastX(0.f),
 	mLastY(0.f),
 	mCameraSpeed(0),
-	mBaseCameraSpeed(2.5f),
+	mBaseCameraSpeed(5.0f),
 	mFirstMouse(true),
-	mSensitivity(0.01f),
+	mSensitivity(0.07f),
 	mRollSensitivity(0.01f)
 {
 	if (window == nullptr || camera == nullptr) {
