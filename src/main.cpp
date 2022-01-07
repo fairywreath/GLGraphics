@@ -14,6 +14,8 @@
 #include "content/TexturedRectangle.h"
 #include "content/RotatingCube.h"
 #include "content/LightingScene.h"
+#include "content/LightingScene2.h"
+
 
 
 /* glfw callbacks */
@@ -51,7 +53,7 @@ int main()
 	FlyCamera flyCam((float)1600 / (float)900);
 	FlyCameraController camCtrl(&window, &flyCam);
 
-	auto lightingScene = std::make_unique<LightingScene>();
+	auto lightingScene = std::make_unique<LightingScene2>();
 	lightingScene->init();
 	lightingScene->setCamera(&flyCam);
 	sceneGraph.attachChild(std::move(lightingScene));
