@@ -35,6 +35,7 @@ private:
 	glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
 
 	float deltaTime = 0;
+	float elapsedTime = 0;
 
 	// for rotation 
 	float currentAngle = 0;

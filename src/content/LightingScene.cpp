@@ -100,15 +100,24 @@ void LightingScene::drawCurrent()
 
     // draw cube
     lightingShader.use();
-    lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-    lightingShader.setVec3("lightColor", lightColor);
+    lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+    lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+    lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    lightingShader.setFloat("material.shininess", 32.0f);
+
+    glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+    lightingShader.setVec3("light.ambient", ambientColor);
+    lightingShader.setVec3("light.diffuse", diffuseColor);
+    lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
     lightingShader.setMat4("projection", camera->getProjectionMatrix());
     lightingShader.setMat4("view", camera->getViewMatrix());
 
     // world position for light pos
     auto& matrix = lightSourceModel;
     glm::vec4 pos = matrix * glm::vec4(0, 0, 0, 1.f);
-    lightingShader.setVec3("lightPos", glm::vec3(pos));
+    lightingShader.setVec3("light.position", glm::vec3(pos));
 
     lightingShader.setVec3("viewPos", camera->getPosition());
 
@@ -123,6 +132,11 @@ void LightingScene::drawCurrent()
 void LightingScene::updateCurrent(float dt)
 {
     deltaTime = dt;
+    elapsedTime += dt;
+
+    lightColor.x = sin(elapsedTime * 2.0f);
+    lightColor.y = sin(elapsedTime * 0.7f);
+    lightColor.z = sin(elapsedTime * 1.3f);
 
     currentAngle += dt;
     setRotationQuaternion(glm::angleAxis(currentAngle,
