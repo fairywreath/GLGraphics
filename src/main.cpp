@@ -15,6 +15,8 @@
 #include "content/RotatingCube.h"
 #include "content/LightingScene.h"
 #include "content/LightingScene2.h"
+#include "content/LightingScene3.h"
+
 
 
 
@@ -53,7 +55,7 @@ int main()
 	FlyCamera flyCam((float)1600 / (float)900);
 	FlyCameraController camCtrl(&window, &flyCam);
 
-	auto lightingScene = std::make_unique<LightingScene2>();
+	auto lightingScene = std::make_unique<LightingScene3>();
 	lightingScene->init();
 	lightingScene->setCamera(&flyCam);
 	sceneGraph.attachChild(std::move(lightingScene));
