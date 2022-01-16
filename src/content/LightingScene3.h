@@ -46,7 +46,9 @@ private:
 	glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
 	
 
-	glm::vec3 pointLightColor = glm::vec3(0.3f, 0.3f, 0.7f);
+	//glm::vec3 pointLightColor = glm::vec3(0.3f, 0.3f, 0.7f);
+	glm::vec3 pointLightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+
 
 	float deltaTime = 0;
 	float elapsedTime = 0;

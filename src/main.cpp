@@ -9,6 +9,7 @@
 #include "scene/Camera.h"
 #include "core/Window.h"
 #include "core/CameraController.h"
+#include "mesh/Model.h"
 
 #include "content/SimpleTriangle.h"
 #include "content/TexturedRectangle.h"
@@ -58,13 +59,22 @@ int main()
 	auto lightingScene = std::make_unique<LightingScene3>();
 	lightingScene->init();
 	lightingScene->setCamera(&flyCam);
-	sceneGraph.attachChild(std::move(lightingScene));
+	//sceneGraph.attachChild(std::move(lightingScene));
 
 	float currentFrame;
 	float deltaTime = 0.f;
 	float lastFrame = 0.f;
 
 	window.setCursorMode(GLFW_CURSOR_DISABLED);
+
+	Model backpack("resources/models/smaug/smaug.obj");
+	ShaderProgram modelShader("shaders/model_loading.vs.glsl", "shaders/model_loading.fs.glsl");
+	backpack.pShader = &modelShader;
+	backpack.init();
+
+	glm::mat4 model = glm::mat4(1.0f);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glEnable(GL_DEPTH_TEST);
 	while (!window.shouldClose())
@@ -80,9 +90,16 @@ int main()
 		camCtrl.update(deltaTime);
 		flyCam.update(deltaTime);
 
+		modelShader.use();
+		modelShader.setMat4("model", model);
+		modelShader.setMat4("projection", flyCam.getProjectionMatrix());
+		modelShader.setMat4("view", flyCam.getViewMatrix());
 
-		sceneGraph.draw();
-		sceneGraph.update(deltaTime);
+		
+		
+		backpack.draw();
+		//sceneGraph.draw();
+		//sceneGraph.update(deltaTime);
 
 		window.nextFrame();
 	}

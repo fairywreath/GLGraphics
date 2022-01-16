@@ -8,6 +8,13 @@
 class Texture
 {
 public:
+	enum class TYPE
+	{
+		DIFFUSE, 
+		SPECULAR
+	};
+
+	
 	Texture();
 	virtual ~Texture();
 
@@ -15,6 +22,8 @@ public:
 
 	bool load(const std::string& path);
 
+public:
+	TYPE Type = TYPE::DIFFUSE;
 
 private:
 	GLuint mID;

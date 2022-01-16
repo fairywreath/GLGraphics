@@ -8,7 +8,7 @@ FlyCameraController::FlyCameraController(Window* window, FlyCamera* camera) :
 	mLastX(0.f),
 	mLastY(0.f),
 	mCameraSpeed(0),
-	mBaseCameraSpeed(5.0f),
+	mBaseCameraSpeed(20.0f),
 	mFirstMouse(true),
 	mSensitivity(0.07f),
 	mRollSensitivity(0.01f)
