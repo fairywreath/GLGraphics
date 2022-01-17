@@ -32,7 +32,7 @@ bool Texture::load(const std::string& path)
 		return false;
 	}
 
-	GLenum format;
+	GLenum format = GL_RGB;
 	if (nrComponents == 1)
 		format = GL_RED;
 	else if (nrComponents == 3)

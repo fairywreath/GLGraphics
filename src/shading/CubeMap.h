@@ -5,14 +5,17 @@
 
 #include <glad/glad.h>
 
+#include <vector>
+
 class CubeMap 
 {
 public:
-	void init();
-
+	void loadCubeMap(const std::vector<std::string>& faces);
+	
+	GLuint getID() const;
 
 private:
-	GLuint mTextureID;
+	GLuint mTextureID = 0;
 
 };
 

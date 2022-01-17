@@ -5,11 +5,14 @@
 
 #include "shading/ShaderProgram.h"
 #include "shading/Texture.h"
+#include "shading/CubeMap.h"
 #include "scene/SceneNode.h"
 #include "scene/Camera.h"
 #include "core/Window.h"
 #include "core/CameraController.h"
 #include "mesh/Model.h"
+#include "scene/Skybox.h"
+
 
 #include "content/SimpleTriangle.h"
 #include "content/TexturedRectangle.h"
@@ -68,9 +71,9 @@ int main()
 
 	ShaderProgram modelShader("shaders/model_loading.vs.glsl", "shaders/model_loading.fs.glsl");
 
-	//Model backpack("resources/models/backpack/backpack.obj");
-	//backpack.pShader = &modelShader;
-	//backpack.init();
+	Model backpack("resources/models/backpack/backpack.obj");
+	backpack.pShader = &modelShader;
+	backpack.init();
 
 	//Model sponza("resources/models/sponza/sponza.obj");
 	//sponza.pShader = &modelShader;
@@ -97,12 +100,28 @@ int main()
 	// face to cut/cull
 	glFrontFace(GL_CCW);		// winding order of front face, by defaut CCW
 
-	FrameBuffersScene fboScene;
-	fboScene.init();
-	fboScene.setCamera(&flyCam);
+	//FrameBuffersScene fboScene;
+	//fboScene.init();
+	//fboScene.setCamera(&flyCam);
 
 	window.setCursorMode(GLFW_CURSOR_DISABLED);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	ShaderProgram skyboxShader("shaders/skybox.vs.glsl", "shaders/skybox.fs.glsl");
+	
+	Skybox skybox;
+	skybox.pShader = &skyboxShader;
+	skybox.pCamera = &flyCam;
+	skybox.load({
+			"resources/textures/skybox/space1/right.png",
+			"resources/textures/skybox/space1/left.png",
+			"resources/textures/skybox/space1/top.png",
+			"resources/textures/skybox/space1/bottom.png",
+			"resources/textures/skybox/space1/front.png",
+			"resources/textures/skybox/space1/back.png"
+			});
+
+	glm::mat4 view;
 
 	while (!window.shouldClose())
 	{
@@ -117,23 +136,19 @@ int main()
 		camCtrl.update(deltaTime);
 		flyCam.update(deltaTime);
 
-		fboScene.draw();
+		//fboScene.draw();
 
-		//modelShader.use();
-		//modelShader.setMat4("model", glm::mat4(1.0f));
-		//modelShader.setMat4("projection", flyCam.getProjectionMatrix());
-		//modelShader.setMat4("view", flyCam.getViewMatrix());
+		modelShader.use();
+		modelShader.setMat4("model", glm::mat4(1.0f));
+		modelShader.setMat4("projection", flyCam.getProjectionMatrix());
+		modelShader.setMat4("view", flyCam.getViewMatrix());
 
+		backpack.update(deltaTime);
+		modelShader.setMat4("model", backpack.getTransform());
+		backpack.draw();
 
-		//backpack.update(deltaTime);
-		//modelShader.setMat4("model", backpack.getTransform());
-		//backpack.draw();
-
-		//sponza.setPosition(glm::vec3(0.0f, -4.f, 0.0f));
-		//sponza.setScale(glm::vec3(0.04f, 0.04f, 0.04f));
-		//sponza.update(deltaTime);
-		//modelShader.setMat4("model", sponza.getTransform());
-		//sponza.draw();
+		// draw skybox as last
+		skybox.draw();
 
 		//sceneGraph.draw();
 		//sceneGraph.update(deltaTime);
@@ -147,3 +162,5 @@ int main()
 
 	return 0;
 }
+
+
