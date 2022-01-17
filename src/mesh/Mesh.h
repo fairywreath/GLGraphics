@@ -26,7 +26,7 @@ public:
 	Mesh();
 	virtual ~Mesh();
 
-	void init();
+	virtual void init();
 	void draw() const;
 
 

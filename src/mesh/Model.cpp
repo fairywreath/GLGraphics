@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+Model::Model()
+{
+}
+
 Model::Model(const std::string& path)
 {
 	loadModel(path);

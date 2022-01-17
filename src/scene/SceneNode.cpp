@@ -92,10 +92,10 @@ void SceneNode::forceComputeTransform()
 {
 	if (getShouldUpdateTransform()) {
 		updateWorldMatrix();
-		mGlobalTransform = mParentGlobalTransform * getTransform();
 		mGlobalTransformDirty = true;
-	} else if (mGlobalTransformDirty) {
-		mGlobalTransform = mParentGlobalTransform * mGlobalTransform;
+	}  
+	if (mGlobalTransformDirty) {
+		mGlobalTransform = mParentGlobalTransform * getTransform();
 	}
 
 	for (auto& child : mChildren) {
@@ -129,6 +129,7 @@ void SceneNode::drawCurrent()
 
 void SceneNode::updateCurrent(float dt)
 {
+
 }
 
 

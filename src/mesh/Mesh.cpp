@@ -25,10 +25,12 @@ void Mesh::init()
 	glBindVertexArray(VAO);
 	
 	// vertices positions
-	glBindBuffer(GL_ARRAY_BUFFER, mVerticesVBO);
-	glBufferData(GL_ARRAY_BUFFER, Positions.size() * sizeof(Positions[0]), &Positions[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(Mesh::ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(Positions[0]), (void*)0);
-	glEnableVertexAttribArray(Mesh::ATTRIBUTE_POSITION);
+	if (Positions.size() > 0) {
+		glBindBuffer(GL_ARRAY_BUFFER, mVerticesVBO);
+		glBufferData(GL_ARRAY_BUFFER, Positions.size() * sizeof(Positions[0]), &Positions[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(Mesh::ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(Positions[0]), (void*)0);
+		glEnableVertexAttribArray(Mesh::ATTRIBUTE_POSITION);
+	}
 
 	// normals
 	if (Normals.size() > 0) {
@@ -39,14 +41,18 @@ void Mesh::init()
 	}
 
 	// tex coords
-	glBindBuffer(GL_ARRAY_BUFFER, mTexCoordsVBO);
-	glBufferData(GL_ARRAY_BUFFER, TexCoords.size() * sizeof(TexCoords[0]), &TexCoords[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(Mesh::ATTRIBUTE_TEXCOORDS, 2, GL_FLOAT, GL_FALSE, sizeof(TexCoords[0]), (void*)0);
-	glEnableVertexAttribArray(Mesh::ATTRIBUTE_TEXCOORDS);
+	if (TexCoords.size() > 0) {
+		glBindBuffer(GL_ARRAY_BUFFER, mTexCoordsVBO);
+		glBufferData(GL_ARRAY_BUFFER, TexCoords.size() * sizeof(TexCoords[0]), &TexCoords[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(Mesh::ATTRIBUTE_TEXCOORDS, 2, GL_FLOAT, GL_FALSE, sizeof(TexCoords[0]), (void*)0);
+		glEnableVertexAttribArray(Mesh::ATTRIBUTE_TEXCOORDS);
+	}
 
 	// indices
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(unsigned int), &Indices[0], GL_STATIC_DRAW);
+	if (Indices.size() > 0) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(unsigned int), &Indices[0], GL_STATIC_DRAW);
+	}
 
 	// unbind vao
 	glBindVertexArray(0);
@@ -81,7 +87,37 @@ void Mesh::draw() const
 
 	// only indexed triangles for now
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, (GLsizei)Indices.size(), GL_UNSIGNED_INT, 0);
+
+	if (Indices.size() > 0) {
+		switch (Topology) {
+			case TOPOLOGY::TRIANGLES:
+				glDrawElements(GL_TRIANGLES, (GLsizei)Indices.size(), GL_UNSIGNED_INT, 0);
+				break;
+			case TOPOLOGY::TRIANGLE_STRIP:
+				glDrawElements(GL_TRIANGLE_STRIP, (GLsizei)Indices.size(), GL_UNSIGNED_INT, 0);
+				break;
+			default:
+				glDrawElements(GL_TRIANGLES, (GLsizei)Indices.size(), GL_UNSIGNED_INT, 0);
+				break;
+		}
+	}
+	else if (Positions.size() > 0) {
+		switch (Topology) {
+			case TOPOLOGY::TRIANGLES:
+				glDrawArrays(GL_TRIANGLES, 0, Positions.size());
+				break;
+			case TOPOLOGY::TRIANGLE_STRIP:
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, Positions.size());
+				break;
+			default:
+				glDrawArrays(GL_TRIANGLES, 0, Positions.size());
+				break;
+		}
+	}
+	else {
+		std::cout << "WARNING::MESH:: No vertices present.\n";
+	}
+
 
 	glBindVertexArray(0);
 }

@@ -8,7 +8,7 @@ FlyCameraController::FlyCameraController(Window* window, FlyCamera* camera) :
 	mLastX(0.f),
 	mLastY(0.f),
 	mCameraSpeed(0),
-	mBaseCameraSpeed(20.0f),
+	mBaseCameraSpeed(10.0f),
 	mFirstMouse(true),
 	mSensitivity(0.07f),
 	mRollSensitivity(0.01f)
@@ -77,14 +77,14 @@ void FlyCameraController::onCursorPos(double x, double y)
 	mCamera->setYaw(mCamera->getYaw() + xoffset);
 	mCamera->setPitch(mCamera->getPitch() + yoffset);
 
-	if (mCamera->getPitch() > 89.0f)
-	{
-		mCamera->setPitch(89.0f);
-	}
-	if (mCamera->getYaw() < -89.0f)
-	{
-		mCamera->setYaw(-89.0f);
-	}
+	//if (mCamera->getPitch() > 89.0f)
+	//{
+	//	mCamera->setPitch(89.0f);
+	//}
+	//if (mCamera->getYaw() < -89.0f)
+	//{
+	//	mCamera->setYaw(-89.0f);
+	//}
 }
 
 void FlyCameraController::onMouseButton(int key, int action, int mods)
