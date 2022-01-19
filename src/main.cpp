@@ -100,6 +100,11 @@ int main()
 	// face to cut/cull
 	glFrontFace(GL_CCW);		// winding order of front face, by defaut CCW
 
+
+	// multisampling
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	glEnable(GL_MULTISAMPLE);
+
 	//FrameBuffersScene fboScene;
 	//fboScene.init();
 	//fboScene.setCamera(&flyCam);

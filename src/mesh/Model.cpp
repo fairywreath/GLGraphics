@@ -43,14 +43,14 @@ void Model::loadModel(const std::string& path)
 
 void Model::processNode(aiNode* node, const aiScene* scene)
 {
-	std::cout << "number of meshes: " << node->mNumMeshes << "\n";
+	//std::cout << "number of meshes: " << node->mNumMeshes << "\n";
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		mMeshes.push_back(processMesh(mesh, scene));
 	}
 
-	std::cout << "number of children: " << node->mNumChildren << "\n";
+	//std::cout << "number of children: " << node->mNumChildren << "\n";
 
 	// then do the same for each of its children
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -63,7 +63,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
 	Mesh res;
 
-	std::cout << "start mesh processing, num of vertices: " << mesh->mNumVertices << "\n";
+	//std::cout << "start mesh processing, num of vertices: " << mesh->mNumVertices << "\n";
 
 	// process mesh
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -125,7 +125,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 		aiString str;
 		mat->GetTexture(type, i, &str);
 		std::string filename = mDirectory + '/' + str.C_Str();
-		std::cout << "texture filename: " << filename << std::endl;
+		//std::cout << "texture filename: " << filename << std::endl;
 
 		if (mLoadedTextures.find(filename) != mLoadedTextures.end()) {
 			continue;
