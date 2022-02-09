@@ -21,6 +21,8 @@
 #include "content/LightingScene2.h"
 #include "content/LightingScene3.h"
 #include "content/Framebuffers/FrameBuffersScene.h"
+#include "content/GeomShader/GeomShaderScene.h"
+
 
 
 
@@ -71,9 +73,9 @@ int main()
 
 	ShaderProgram modelShader("shaders/model_loading.vs.glsl", "shaders/model_loading.fs.glsl");
 
-	Model backpack("resources/models/backpack/backpack.obj");
-	backpack.pShader = &modelShader;
-	backpack.init();
+	//Model backpack("resources/models/backpack/backpack.obj");
+	//backpack.pShader = &modelShader;
+	//backpack.init();
 
 	//Model sponza("resources/models/sponza/sponza.obj");
 	//sponza.pShader = &modelShader;
@@ -109,24 +111,25 @@ int main()
 	//fboScene.init();
 	//fboScene.setCamera(&flyCam);
 
-	window.setCursorMode(GLFW_CURSOR_DISABLED);
+	//window.setCursorMode(GLFW_CURSOR_DISABLED);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	ShaderProgram skyboxShader("shaders/skybox.vs.glsl", "shaders/skybox.fs.glsl");
-	
-	Skybox skybox;
-	skybox.pShader = &skyboxShader;
-	skybox.pCamera = &flyCam;
-	skybox.load({
-			"resources/textures/skybox/space1/right.png",
-			"resources/textures/skybox/space1/left.png",
-			"resources/textures/skybox/space1/top.png",
-			"resources/textures/skybox/space1/bottom.png",
-			"resources/textures/skybox/space1/front.png",
-			"resources/textures/skybox/space1/back.png"
-			});
+	//ShaderProgram skyboxShader("shaders/skybox.vs.glsl", "shaders/skybox.fs.glsl");
+	//
+	//Skybox skybox;
+	//skybox.pShader = &skyboxShader;
+	//skybox.pCamera = &flyCam;
+	//skybox.load({
+	//		"resources/textures/skybox/space1/right.png",
+	//		"resources/textures/skybox/space1/left.png",
+	//		"resources/textures/skybox/space1/top.png",
+	//		"resources/textures/skybox/space1/bottom.png",
+	//		"resources/textures/skybox/space1/front.png",
+	//		"resources/textures/skybox/space1/back.png"
+	//		});
 
-	glm::mat4 view;
+
+	GeomShaderScene geomScene;
 
 	while (!window.shouldClose())
 	{
@@ -137,23 +140,30 @@ int main()
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+
+		geomScene.draw();
+
+
+
 		processInput(window.getWindowHandle());
 		camCtrl.update(deltaTime);
 		flyCam.update(deltaTime);
 
 		//fboScene.draw();
 
-		modelShader.use();
-		modelShader.setMat4("model", glm::mat4(1.0f));
-		modelShader.setMat4("projection", flyCam.getProjectionMatrix());
-		modelShader.setMat4("view", flyCam.getViewMatrix());
+		//modelShader.use();
+		//modelShader.setMat4("model", glm::mat4(1.0f));
+		//modelShader.setMat4("projection", flyCam.getProjectionMatrix());
+		//modelShader.setMat4("view", flyCam.getViewMatrix());
 
-		backpack.update(deltaTime);
-		modelShader.setMat4("model", backpack.getTransform());
-		backpack.draw();
+		//sponza.draw();
+
+		//backpack.update(deltaTime);
+		//modelShader.setMat4("model", backpack.getTransform());
+		//backpack.draw();
 
 		// draw skybox as last
-		skybox.draw();
+		//skybox.draw();
 
 		//sceneGraph.draw();
 		//sceneGraph.update(deltaTime);

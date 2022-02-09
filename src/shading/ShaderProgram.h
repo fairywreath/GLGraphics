@@ -6,17 +6,25 @@
 
 #include <string>
 
+#include "Shader.h"
+
 class ShaderProgram
 {
 public:
 	ShaderProgram();
 	ShaderProgram(const char* vsPath, const char* fsPath);
+	ShaderProgram(const char* vsPath, const char* gsPath, const char* fsPath);
+
 	virtual ~ShaderProgram();
 
 	bool load(const char* vsPath, const char* fsPath);
+	bool load(const char* vsPath, const char* gsPath, const char* fsPath);
+
+	void deleteShaderProgram();
 
 	void use() const;
 	GLuint getID() const;
+	bool isLoaded() const;
 
 	void setBool(const std::string& name, bool value) const;
 	void setInt(const std::string& name, int value) const;
@@ -38,6 +46,7 @@ public:
 
 private:
 	GLuint mID;
+	bool mIsLoaded;
 };
 
 #endif

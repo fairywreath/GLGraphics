@@ -7,101 +7,102 @@
 #include <glm\gtc\type_ptr.hpp>
 
 ShaderProgram::ShaderProgram() :
-	mID(0)
+	mID(0),
+	mIsLoaded(false)
 {
 }
 
 ShaderProgram::ShaderProgram(const char* vsPath, const char* fsPath) :
-	mID(0)
+	mID(0),
+	mIsLoaded(false)
 {
 	load(vsPath, fsPath);
 }
 
+ShaderProgram::ShaderProgram(const char* vsPath, const char* gsPath, const char* fsPath) :
+	mID(0),
+	mIsLoaded(false)
+{
+	load(vsPath, gsPath, fsPath);
+}
+
 ShaderProgram::~ShaderProgram()
 {
+	deleteShaderProgram();
 }
 
 bool ShaderProgram::load(const char* vsPath, const char* fsPath)
 {
-	std::string vertSource;
-	std::string fragSource;
-	std::ifstream vsFile;
-	std::ifstream fsFile;
-
-	// ensure filestream can throw exceptions
-	vsFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	fsFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-	try
-	{
-		vsFile.open(vsPath);
-		fsFile.open(fsPath);
-
-		std::stringstream vsStream;
-		std::stringstream fsStream;
-
-		vsStream << vsFile.rdbuf();
-		fsStream << fsFile.rdbuf();
-
-		vsFile.close();
-		fsFile.close();
-
-		vertSource = vsStream.str();
-		fragSource = fsStream.str();
-	}
-	catch (std::ifstream::failure err)
-	{
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-	}
-
-	const char* vsSource = vertSource.c_str();
-	const char* fsSource = fragSource.c_str();
-
-	// compile shaders
-	GLuint vs, fs;
-
-	int success;
-	char infoLog[512];
-
-	vs = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs, 1, &vsSource, nullptr);
-	glCompileShader(vs);
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vs, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	};
-
-	fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs, 1, &fsSource, nullptr);
-	glCompileShader(fs);
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fs, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	};
+	Shader vertShader(vsPath, GL_VERTEX_SHADER);
+	Shader fragShader(fsPath, GL_FRAGMENT_SHADER);
 
 	mID = glCreateProgram();
-	glAttachShader(mID, vs);
-	glAttachShader(mID, fs);
+	glAttachShader(mID, vertShader.getId());
+	glAttachShader(mID, fragShader.getId());
 	glLinkProgram(mID);
+
+	GLint success;
+	GLchar infoLog[1024];
+	glGetProgramiv(mID, GL_LINK_STATUS, &success);
 	if (!success)
 	{
-		glGetProgramInfoLog(mID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		glGetProgramInfoLog(mID, 1024, NULL, infoLog);
+		std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: \n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+
+		glDeleteProgram(mID);
+		mID = 0;
 	}
 
-	glDeleteShader(vs);
-	glDeleteShader(fs);
+	mIsLoaded = static_cast<bool>(success);
+	return mIsLoaded;
+}
 
-	return success;
+bool ShaderProgram::load(const char* vsPath, const char* gsPath, const char* fsPath)
+{
+	Shader vertShader(vsPath, GL_VERTEX_SHADER);
+	Shader geomShader(gsPath, GL_GEOMETRY_SHADER);
+	Shader fragShader(fsPath, GL_FRAGMENT_SHADER);
+
+	mID = glCreateProgram();
+	glAttachShader(mID, vertShader.getId());
+	glAttachShader(mID, geomShader.getId());
+	glAttachShader(mID, fragShader.getId());
+	glLinkProgram(mID);
+
+	GLint success;
+	GLchar infoLog[1024];
+	glGetProgramiv(mID, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		glGetProgramInfoLog(mID, 1024, NULL, infoLog);
+		std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: \n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+	
+		glDeleteProgram(mID);
+		mID = 0;
+	}
+
+	mIsLoaded = static_cast<bool>(success);
+	return mIsLoaded;
+}
+
+void ShaderProgram::deleteShaderProgram()
+{
+	if (mIsLoaded)
+	{
+		glDeleteProgram(mID);
+		mID = 0;
+		mIsLoaded = false;
+	}
 }
 
 GLuint ShaderProgram::getID() const
 {
 	return mID;
+}
+
+bool ShaderProgram::isLoaded() const
+{
+	return mIsLoaded;
 }
 
 

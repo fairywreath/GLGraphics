@@ -120,5 +120,5 @@ void FlyCamera::computeViewMatrix()
 
 void FlyCamera::computeProjectionMatrix()
 {
-	mProjection = glm::perspective(glm::radians(mFov), mAspectRatio, 0.1f, 1000.f);		// last two args are near and far clip planes
+	mProjection = glm::perspective(glm::radians(mFov), mAspectRatio, 0.1f, 10000000.f);		// last two args are near and far clip planes
 }
