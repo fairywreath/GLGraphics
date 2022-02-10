@@ -22,6 +22,8 @@
 #include "content/LightingScene3.h"
 #include "content/Framebuffers/FrameBuffersScene.h"
 #include "content/GeomShader/GeomShaderScene.h"
+#include "content/GeomShader/ExplodingGeomScene.h"
+
 
 
 
@@ -130,6 +132,8 @@ int main()
 
 
 	GeomShaderScene geomScene;
+	ExplodingGeomScene explodingScene;
+	explodingScene.setCamera(&flyCam);
 
 	while (!window.shouldClose())
 	{
@@ -140,14 +144,15 @@ int main()
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-
-		geomScene.draw();
-
-
-
 		processInput(window.getWindowHandle());
 		camCtrl.update(deltaTime);
 		flyCam.update(deltaTime);
+
+		explodingScene.update(currentFrame);
+		explodingScene.draw();
+
+		//geomScene.draw();
+
 
 		//fboScene.draw();
 
@@ -155,12 +160,14 @@ int main()
 		//modelShader.setMat4("model", glm::mat4(1.0f));
 		//modelShader.setMat4("projection", flyCam.getProjectionMatrix());
 		//modelShader.setMat4("view", flyCam.getViewMatrix());
-
-		//sponza.draw();
-
+		//backpack.draw();
+		
 		//backpack.update(deltaTime);
 		//modelShader.setMat4("model", backpack.getTransform());
 		//backpack.draw();
+
+
+		//sponza.draw();
 
 		// draw skybox as last
 		//skybox.draw();
